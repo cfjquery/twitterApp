@@ -7,7 +7,13 @@
 * 6/20/2012
 */
 
+.success{
+	color: green;
+}
 
+.failure{
+	color: red;
+}
 /* Table of Content
 ==================================================
 	#Reset & Basics

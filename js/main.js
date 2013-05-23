@@ -4,17 +4,20 @@ function sendTweet(){
 	var strURL = 'cfc/twitter.cfc?';
 	strURL += 'method=sendTweet';
 	strURL += '&strTweet=' + txtTweet;
-	$.ajax({
+	var doTweet = $.ajax({
 		url: strURL,
-		dataType: 'json',
-		success: function(response){
-			console.log(response);
-		},
-		error: function(ErrorMsg){
-			console.log('Error');
-			console.log(ErrorMsg);
-		}
-	})
+		dataType: 'html'
+	});
+	doTweet.done(function(msg) {
+		$("#tweetStatus").removeClass('Failure').addClass('Success');
+		$("#tweetStatus").html('Tweet Sent');
+		$("#txtTweet").html('');
+		$("#countTweets").html(parseInt($("#countTweets").html())+1);
+	});	
+	doTweet.fail(function(jqXHR, textStatus) {
+		$("#tweetStatus").removeClass('Success').addClass('Failure');
+		$("#tweetStatus").html('ERROR - ' + textStatus);
+	});
 }
 //COUNT THE CHARACTERS IN THE TWEET
 function chrCount(txtTweet) {
@@ -25,4 +28,7 @@ function chrCount(txtTweet) {
 //SEND A TWEET BY CALLING AJAX FUNCTION THAT CALLS A CFC REMOTELY
 $("#sendTweet").click(function() {
   sendTweet();
+});
+$("#txtTweet").focusin(function(){
+  $("#tweetStatus").text('');
 });

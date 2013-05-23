@@ -1,20 +1,13 @@
 <cfscript>
-	objTwitter = CreateObject("component", "cfc.twitter");
-	//CONFIGURE twitter4j
-	configBuilder = createObject("java", "twitter4j.conf.ConfigurationBuilder");
-	configBuilder.setOAuthConsumerKey(#application.twitter_consumer_key#);
-	configBuilder.setOAuthConsumerSecret(#application.twitter_consumer_secret#);
-	configBuilder.setOAuthAccessToken(#session.twitter_access_token#);
-	configBuilder.setOAuthAccessTokenSecret(#session.twitter_access_token_secret#);
-	configBuilder.setJSONStoreEnabled(true);
-	config = configBuilder.build();
-	twitterFactory = createObject("java", "twitter4j.TwitterFactory").init(config);
-	t4j = twitterFactory.getInstance();
+	//objTwitter = CreateObject("component", "cfc.twitter");
 	//GET THE USER ID OF THE PERSON THAT SIGNED IN AND STORE AS A SESSION VARIABLE FOR LATER USE
-	session.twitter_user_id = t4j.verifyCredentials().getID();
-	//GET THE USER DETAILS
-	userDetails = objTwitter.getUserDetails(t4j);
+	session.twitter_user_id = application.twitter_cfc.getUserId();
+	//GET THE USER DETAILS OF THE PERSON THAT SIGNED IN
+	userDetails = application.twitter_cfc.getUserDetails();
+	//GET THE USER LISTS OF THE PERSON THAT SIGNED IN
+	userLists = application.twitter_cfc.getUserLists(session.twitter_user_id);
 </cfscript>
+<!--- <cfdump var="#userLists#"> --->
 <!DOCTYPE html>
 <!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
 <!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
@@ -59,12 +52,14 @@
 		<div class="one-third column">
 			<input type="button" name="sendTweet" id="sendTweet" value="Tweet">
 			<span id="charCount">140</span>
-			<textarea name="txtTweet" id="txtTweet" onKeyUp="chrCount(this);"></textarea>	
+			<textarea name="txtTweet" id="txtTweet" spellcheck="false" onKeyUp="chrCount(this);" onclick="this.focus();this.select()">
+			</textarea>	
+			<span id="tweetStatus" class="success"></span>
 		</div>
 		<div class="one-third column">
 			Following : #userDetails.friends_count#<br/>
 			Followers : #userDetails.followers_count#<br/>
-			Tweets &nbsp;&nbsp;&nbsp;&nbsp;: #userDetails.status_count#
+			Tweets &nbsp;&nbsp;&nbsp;&nbsp;: <span id="countTweets">#userDetails.status_count#</span>
 		</div>
 		<hr />
 		<div class="one-third column">
@@ -72,6 +67,11 @@
 			<p>We will use these columns later for Timelines, your tweets and Lists.</p>
 		</div>
 		<div class="one-third column">
+			<select name="selectType_1" id="selectType_1" class="SelectType">
+				<cfloop query="userLists">
+					<option value="#id#">#name#</option>
+				</cfloop>
+			</select>
 			<h3>Column 2</h3>
 			<p>We will use these columns later for Timelines, your tweets and Lists.</p>
 		</div>
@@ -81,7 +81,6 @@
 		</div>
 	</div>
 	</form>
-   	<cfdump var="#userDetails#">
 </cfoutput>
 <script src="js/main.js"></script>
 </body>

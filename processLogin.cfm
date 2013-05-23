@@ -17,8 +17,8 @@
 		else{
 			//WHEN USER RETURNS BACK FROM AUTHENTCATION, SET THE SESSION VARIABLES
 			getAccessToken = t4j.getOAuthAccessToken(session.requestToken, url.oauth_verifier);
-			session.twitter_access_token = getAccessToken.getToken();
-			session.twitter_access_token_secret =  getAccessToken.getTokenSecret();
+			application.twitter_access_token = getAccessToken.getToken();
+			application.twitter_access_token_secret =  getAccessToken.getTokenSecret();
 			location(url="main.cfm");
 		}
 	}
